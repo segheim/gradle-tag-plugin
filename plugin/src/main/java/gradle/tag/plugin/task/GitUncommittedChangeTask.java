@@ -12,7 +12,7 @@ import java.util.Optional;
 
 public class GitUncommittedChangeTask extends DefaultTask {
 
-    private static final String GIT_COMMAND_UNCOMMITTED_CHANGES = "git diff --cached";
+    private static final String GIT_COMMAND_UNCOMMITTED_CHANGES = "git diff";
 
     private final Logger log;
 
