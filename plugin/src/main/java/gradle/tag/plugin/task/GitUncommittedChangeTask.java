@@ -25,6 +25,7 @@ public class GitUncommittedChangeTask extends DefaultTask {
     @TaskAction
     public void checkUncommittedChanges() {
         boolean isUncommittedChanges = false;
+        boolean isUncommittedChangesCached = false;
         Optional<String> uncommittedChanges = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES);
         Optional<String> uncommittedChangesCached = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES_CACHED);
 
@@ -37,13 +38,13 @@ public class GitUncommittedChangeTask extends DefaultTask {
         }
         if(uncommittedChangesCached.isPresent()) {
             log.info("CACHEDCommit present: {}", uncommittedChangesCached.get());
-            isUncommittedChanges = true;
+            isUncommittedChangesCached = true;
             if (uncommittedChangesCached.get() == "") {
                 log.info("EMPTY cached commit");
-                isUncommittedChanges = false;
+                isUncommittedChangesCached = false;
             }
         }
         log.info("result: " + isUncommittedChanges);
-        this.getExtensions().add("result", isUncommittedChanges);
+        this.getExtensions().add("result", isUncommittedChanges || isUncommittedChangesCached);
     }
 }
