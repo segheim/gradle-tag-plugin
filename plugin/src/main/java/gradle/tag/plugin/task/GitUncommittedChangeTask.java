@@ -24,19 +24,26 @@ public class GitUncommittedChangeTask extends DefaultTask {
 
     @TaskAction
     public void checkIsUncommittedChanges() {
+        boolean isUncommittedChanges = false;
         Optional<String> uncommittedChanges = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES);
         Optional<String> uncommittedChangesCached = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES_CACHED);
-        log.info(uncommittedChanges.isPresent());
+
         if(uncommittedChanges.isPresent()) {
             log.info("Commit present: {}", uncommittedChanges.get());
-        } else {
-            log.info("Commit absent: {}", uncommittedChanges.get());
+            isUncommittedChanges = true;
+            if (uncommittedChanges.get() == "") {
+                isUncommittedChanges = false;
+            }
         }
         if(uncommittedChangesCached.isPresent()) {
-            log.info("CACHEDCommit present: {}", uncommittedChanges.get());
-        } else {
-            log.info("CACHEDCommit absent: {}", uncommittedChanges.get());
+            log.info("CACHEDCommit present: {}", uncommittedChangesCached.get());
+            isUncommittedChanges = true;
+            if (uncommittedChangesCached.get() == "") {
+                log.info("EMPTY cached commit");
+                isUncommittedChanges = false;
+            }
         }
-        this.getExtensions().add("result", uncommittedChanges.isPresent());
+        log.info("result: " + isUncommittedChanges);
+        this.getExtensions().add("result", isUncommittedChanges);
     }
 }
