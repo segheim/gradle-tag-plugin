@@ -12,13 +12,18 @@ public class GitLastTagVersionTask extends DefaultTask {
 
     private static final Logger log = LogManager.getLogger(GitLastTagVersionTask.class);
 
-    public static final String GIT_COMMAND_LAST_TAG_VERSION = "git symbolic-ref --short HEAD";
+    public static final String GIT_COMMAND_LAST_TAG_VERSION = "git describe --abbrev=0 --tags";
 
     @TaskAction
     public void getLastTagVersion() {
-//        Optional<String> lastTagVersion = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG_VERSION);
-//        log.info("Build: {}.uncommitted", lastTagVersion.get());
-//        this.getExtensions().add("result", lastTagVersion.isPresent());
-//        return lastTagVersion.isPresent();
+        String lastTagVersion = "";
+        Optional<String> lastTagVersionOptional = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG_VERSION);
+        if (lastTagVersionOptional.isPresent()) {
+            if (lastTagVersionOptional.get() != "") {
+                log.info("Build: {}.uncommitted", lastTagVersionOptional.get());
+                lastTagVersion = lastTagVersionOptional.get();
+            }
+        }
+        this.getExtensions().add("result", lastTagVersion);
     }
 }

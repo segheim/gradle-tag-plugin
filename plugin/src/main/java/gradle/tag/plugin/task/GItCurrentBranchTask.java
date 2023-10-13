@@ -12,7 +12,7 @@ public class GItCurrentBranchTask extends DefaultTask {
 
     private static final Logger log = LogManager.getLogger(GItCurrentBranchTask.class);
 
-    public static final String GIT_COMMAND_CURRENT_BRANCH = "git rev-parse --abbrev-ref HEAD";
+    public static final String GIT_COMMAND_CURRENT_BRANCH = "git symbolic-ref --short HEAD";
 
     @TaskAction
     public void getGitCurrentBranch() {

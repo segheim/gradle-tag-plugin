@@ -14,6 +14,7 @@ public class GitUncommittedChangeTask extends DefaultTask {
 
     private static final String GIT_COMMAND_UNCOMMITTED_CHANGES = "git diff";
     private static final String GIT_COMMAND_UNCOMMITTED_CHANGES_CACHED = "git diff --cached";
+    public static final String GIT_COMMAND_LAST_TAG_VERSION = "git describe --abbrev=0 --tags";
 
     private final Logger log;
 
@@ -44,7 +45,17 @@ public class GitUncommittedChangeTask extends DefaultTask {
                 isUncommittedChangesCached = false;
             }
         }
-        log.info("result: " + isUncommittedChanges);
-        this.getExtensions().add("result", isUncommittedChanges || isUncommittedChangesCached);
+        boolean result = isUncommittedChanges || isUncommittedChangesCached;
+        log.info("result: " + result);
+        if (result) {
+            Optional<String> lastTagVersionOptional = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG_VERSION);
+            if (lastTagVersionOptional.isPresent()) {
+                if (lastTagVersionOptional.get() != "") {
+                    log.info("Build: {}.uncommitted", lastTagVersionOptional.get());
+                }
+            }
+        }
+        log.info("Uncommitted Result: " + result);
+        this.getExtensions().add("result", result);
     }
 }

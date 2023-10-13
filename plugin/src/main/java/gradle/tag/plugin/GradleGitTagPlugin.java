@@ -3,13 +3,18 @@
  */
 package gradle.tag.plugin;
 
+import gradle.tag.plugin.task.GitCreateTagTask;
 import gradle.tag.plugin.task.GitLastTagTask;
 import gradle.tag.plugin.task.GitLastTagVersionTask;
 import gradle.tag.plugin.task.GitUncommittedChangeTask;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 public class GradleGitTagPlugin implements Plugin<Project> {
+
+    private static final Logger log = LogManager.getLogger(GradleGitTagPlugin.class);
 
     public static final String TASK_GROUP_NAME = "git tag";
 
@@ -20,8 +25,11 @@ public class GradleGitTagPlugin implements Plugin<Project> {
         gitCheckUncommittedChanges.setGroup(TASK_GROUP_NAME);
 
         GitLastTagTask lastTag = project.getTasks().register("gitLastTag", GitLastTagTask.class).get();
+        lastTag.dependsOn(gitCheckUncommittedChanges).setOnlyIf(task -> !(boolean) gitCheckUncommittedChanges.getExtensions().getByName("result"));
         lastTag.setGroup(TASK_GROUP_NAME);
-//        System.out.println(lastTag.getExtensions().getByName("tagValue"));
+
+        GitCreateTagTask createTag = project.getTasks().register("createTag", GitCreateTagTask.class).get();
+        createTag.setGroup(TASK_GROUP_NAME);
 
 //        GitLastTagVersionTask gitGetLastVersion = project.getTasks().register("gitLastVersion", GitLastTagVersionTask.class).get();
 //        gitGetLastVersion
