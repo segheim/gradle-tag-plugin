@@ -23,7 +23,7 @@ public class GitUncommittedChangeTask extends DefaultTask {
     }
 
     @TaskAction
-    public void checkIsUncommittedChanges() {
+    public void checkUncommittedChanges() {
         boolean isUncommittedChanges = false;
         Optional<String> uncommittedChanges = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES);
         Optional<String> uncommittedChangesCached = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES_CACHED);
