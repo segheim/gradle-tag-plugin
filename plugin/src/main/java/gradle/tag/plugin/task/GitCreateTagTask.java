@@ -25,6 +25,7 @@ public class GitCreateTagTask extends DefaultTask {
     public static final String RC_POSTFIX_FOR_STAGE_BRANCH = "-rc";
     public static final String SNAPSHOT_POSTFIX_FOR_OTHER_BRANCHES = "-SNAPSHOT";
 
+    public static final String DEFAULT_TAG_NAME = "v0.1";
     public static final String TAG_NAME = "v%d.%d";
 
     public static final int TAG_MAJOR_BEGIN_INDEX = 1;
@@ -39,7 +40,7 @@ public class GitCreateTagTask extends DefaultTask {
         if (!outputCurrentBranches.isEmpty()) {
             String currentBranch = outputCurrentBranches.get(0);
             List<String> outputLastTag = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG);
-            String tagVersion = "v1.0";
+            String tagVersion = DEFAULT_TAG_NAME;
             if (!outputLastTag.isEmpty()) {
                 String lastTag = outputLastTag.get(0);
                 if (currentBranch.equals(QA_BRANCH_NAME) || currentBranch.equals(DEV_BRANCH_NAME)) {
