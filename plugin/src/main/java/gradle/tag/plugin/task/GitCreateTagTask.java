@@ -1,6 +1,7 @@
 package gradle.tag.plugin.task;
 
 import gradle.tag.plugin.command.ShellRunnerCommand;
+import gradle.tag.plugin.util.CreatorTagVersion;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.gradle.api.DefaultTask;
@@ -26,51 +27,34 @@ public class GitCreateTagTask extends DefaultTask {
     public static final String SNAPSHOT_POSTFIX_FOR_OTHER_BRANCHES = "-SNAPSHOT";
 
     public static final String DEFAULT_TAG_NAME = "v0.1";
-    public static final String TAG_NAME = "v%d.%d";
+    public static final String EMPTY_LINE = "";
 
-    public static final int TAG_MAJOR_BEGIN_INDEX = 1;
-    public static final int TAG_MAJOR_END_INDEX = 2;
-    public static final int TAG_MINOR_BEGIN_INDEX = 3;
-    public static final int TAG_MINOR_END_INDEX = 4;
-    public static final int TAG_MAJOR_NUMBER_VERSION = 0;
+    public static final int INDEX_FIRST_ELEMENT = 0;
 
     @TaskAction
     public void createGitTag() {
         List<String> outputCurrentBranches = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_CURRENT_BRANCH);
         if (!outputCurrentBranches.isEmpty()) {
-            String currentBranch = outputCurrentBranches.get(0);
+            String currentBranch = outputCurrentBranches.get(INDEX_FIRST_ELEMENT);
             List<String> outputLastTag = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG);
-            String tagVersion = DEFAULT_TAG_NAME;
             if (!outputLastTag.isEmpty()) {
-                String lastTag = outputLastTag.get(0);
-                if (currentBranch.equals(QA_BRANCH_NAME) || currentBranch.equals(DEV_BRANCH_NAME)) {
-                    tagVersion = incrementVersion(lastTag, false);
-                } else if (currentBranch.equals(STAGE_BRANCH_NAME)) {
-                    tagVersion = incrementVersion(lastTag, false) + RC_POSTFIX_FOR_STAGE_BRANCH;
-                } else if (currentBranch.equals(MASTER_BRANCH_NAME)) {
-                    tagVersion = incrementVersion(lastTag, true);
-                } else {
-                    tagVersion = lastTag + SNAPSHOT_POSTFIX_FOR_OTHER_BRANCHES;
+                String tagVersion = DEFAULT_TAG_NAME;
+                if (outputLastTag.get(INDEX_FIRST_ELEMENT) == EMPTY_LINE) {
+                    String lastTag = outputLastTag.get(0);
+                    if (currentBranch.equals(QA_BRANCH_NAME) || currentBranch.equals(DEV_BRANCH_NAME)) {
+                        tagVersion = CreatorTagVersion.incrementVersion(lastTag, false);
+                    } else if (currentBranch.equals(STAGE_BRANCH_NAME)) {
+                        tagVersion = CreatorTagVersion.incrementVersion(lastTag, false) + RC_POSTFIX_FOR_STAGE_BRANCH;
+                    } else if (currentBranch.equals(MASTER_BRANCH_NAME)) {
+                        tagVersion = CreatorTagVersion.incrementVersion(lastTag, true);
+                    } else {
+                        tagVersion = lastTag + SNAPSHOT_POSTFIX_FOR_OTHER_BRANCHES;
+                    }
                 }
+                log.info("Tag: {}", tagVersion);
+                ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_CREATE_TAG, tagVersion));
+                ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_PUSH_REMOTE, tagVersion));
             }
-            log.info("Tag: {}", tagVersion);
-            ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_CREATE_TAG, tagVersion));
-            ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_PUSH_REMOTE, tagVersion));
         }
-    }
-
-    private String incrementVersion(String tagVersion, boolean flagMajorVersion) {
-        Integer majorVersion = Integer.parseInt(tagVersion.substring(TAG_MAJOR_BEGIN_INDEX, TAG_MAJOR_END_INDEX));
-        System.out.println(tagVersion.substring(TAG_MAJOR_BEGIN_INDEX, TAG_MAJOR_END_INDEX));
-        Integer minorVersion = Integer.parseInt(tagVersion.substring(TAG_MINOR_BEGIN_INDEX, TAG_MINOR_END_INDEX));
-        String version;
-        if (flagMajorVersion) {
-            majorVersion++;
-            version = String.format(TAG_NAME, majorVersion, TAG_MAJOR_NUMBER_VERSION);
-        } else {
-            minorVersion++;
-            version = String.format(TAG_NAME, majorVersion, minorVersion);
-        }
-        return version;
     }
 }
