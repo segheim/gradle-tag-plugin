@@ -26,9 +26,9 @@ public class GradleGitTagPlugin implements Plugin<Project> {
 
         GitCreateTagTask createTagTask = project.getTasks().register("gitCreateTag", GitCreateTagTask.class).get();
         createTagTask.dependsOn(headTagTask)
-                     .dependsOn(gitCheckUncommittedChangesTask)
-                     .setOnlyIf(task -> !headTagTask.getState().getSkipped()
-                             && !(boolean) headTagTask.getExtensions().getByName("result"));
+                .dependsOn(gitCheckUncommittedChangesTask)
+                .setOnlyIf(task -> !headTagTask.getState().getSkipped()
+                        && !(boolean) headTagTask.getExtensions().getByName("result"));
         createTagTask.setGroup(TASK_GROUP_NAME);
     }
 }
