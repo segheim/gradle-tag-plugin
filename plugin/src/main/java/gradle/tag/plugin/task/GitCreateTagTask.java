@@ -39,7 +39,7 @@ public class GitCreateTagTask extends DefaultTask {
             List<String> outputLastTag = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG);
             if (!outputLastTag.isEmpty()) {
                 String tagVersion = DEFAULT_TAG_NAME;
-                if (outputLastTag.get(INDEX_FIRST_ELEMENT) == EMPTY_LINE) {
+                if (outputLastTag.get(INDEX_FIRST_ELEMENT) != EMPTY_LINE) {
                     String lastTag = outputLastTag.get(0);
                     if (currentBranch.equals(QA_BRANCH_NAME) || currentBranch.equals(DEV_BRANCH_NAME)) {
                         tagVersion = CreatorTagVersion.incrementVersion(lastTag, false);
