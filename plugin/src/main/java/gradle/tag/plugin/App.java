@@ -12,8 +12,8 @@ public class App {
     public static void main(String[] args) {
 //        List<String> commands = List.of("cmd.exe", "/c", "git describe --exact-match --tags HEAD");
 //
-        Optional<String> optional = ShellRunnerCommand.getInstance().execute("git describe --exact-match --tags HEAD");
-        System.out.println(optional.get());
+//        Optional<String> optional = ShellRunnerCommand.getInstance().execute("git describe --exact-match --tags HEAD");
+//        System.out.println(optional.get());
 
 //        try {
 //            ProcessBuilder processBuilder = new ProcessBuilder("cmd.exe", "/c", "gradle -version");

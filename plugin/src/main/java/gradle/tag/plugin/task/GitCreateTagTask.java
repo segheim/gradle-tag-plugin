@@ -6,7 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
-import java.util.Optional;
+import java.util.List;
 
 public class GitCreateTagTask extends DefaultTask {
 
@@ -34,12 +34,12 @@ public class GitCreateTagTask extends DefaultTask {
 
     @TaskAction
     public void createGitTag() {
-        Optional<String> branchOptional = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_CURRENT_BRANCH);
-        if (branchOptional.isPresent()) {
-            String currentBranch = branchOptional.get();
-            Optional<String> lastTagOptional = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG);
-            if (lastTagOptional.isPresent()) {
-                String lastTag = lastTagOptional.get();
+        List<String> outputCurrentBranches = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_CURRENT_BRANCH);
+        if (!outputCurrentBranches.isEmpty()) {
+            String currentBranch = outputCurrentBranches.get(0);
+            List<String> outputLastTag = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG);
+            if (!outputLastTag.isEmpty()) {
+                String lastTag = outputLastTag.get(0);
                 String tagVersion;
                 if (currentBranch.equals(QA_BRANCH_NAME) || currentBranch.equals(DEV_BRANCH_NAME)) {
                     tagVersion = incrementVersion(lastTag, false);
@@ -50,6 +50,8 @@ public class GitCreateTagTask extends DefaultTask {
                 } else {
                     tagVersion = lastTag + SNAPSHOT_POSTFIX_FOR_OTHER_BRANCHES;
                 }
+
+                log.info("Tag: {}", tagVersion);
 
                 ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_CREATE_TAG, tagVersion));
                 ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_PUSH_REMOTE, tagVersion));

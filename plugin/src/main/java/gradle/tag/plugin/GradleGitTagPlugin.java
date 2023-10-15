@@ -4,41 +4,31 @@
 package gradle.tag.plugin;
 
 import gradle.tag.plugin.task.GitCreateTagTask;
-import gradle.tag.plugin.task.GitLastTagTask;
-import gradle.tag.plugin.task.GitLastTagVersionTask;
+import gradle.tag.plugin.task.GitHeadTagTask;
 import gradle.tag.plugin.task.GitUncommittedChangeTask;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 
 public class GradleGitTagPlugin implements Plugin<Project> {
 
-    private static final Logger log = LogManager.getLogger(GradleGitTagPlugin.class);
-
     public static final String TASK_GROUP_NAME = "git tag";
 
     public void apply(Project project) {
         // Register a task
-        GitUncommittedChangeTask gitCheckUncommittedChanges =
+        GitUncommittedChangeTask gitCheckUncommittedChangesTask =
                 project.getTasks().register("gitUncommittedChanges", GitUncommittedChangeTask.class).get();
-        gitCheckUncommittedChanges.setGroup(TASK_GROUP_NAME);
+        gitCheckUncommittedChangesTask.setGroup(TASK_GROUP_NAME);
 
-        GitLastTagTask lastTag = project.getTasks().register("gitLastTag", GitLastTagTask.class).get();
-        lastTag.dependsOn(gitCheckUncommittedChanges).setOnlyIf(task -> !(boolean) gitCheckUncommittedChanges.getExtensions().getByName("result"));
-        lastTag.setGroup(TASK_GROUP_NAME);
+        GitHeadTagTask headTagTask = project.getTasks().register("gitHeadTag", GitHeadTagTask.class).get();
+        headTagTask.dependsOn(gitCheckUncommittedChangesTask)
+                .setOnlyIf(task -> !(boolean) gitCheckUncommittedChangesTask.getExtensions().getByName("result"));
+        headTagTask.setGroup(TASK_GROUP_NAME);
 
-        GitCreateTagTask createTag = project.getTasks().register("createTag", GitCreateTagTask.class).get();
-        createTag.setGroup(TASK_GROUP_NAME);
-
-//        GitLastTagVersionTask gitGetLastVersion = project.getTasks().register("gitLastVersion", GitLastTagVersionTask.class).get();
-//        gitGetLastVersion
-//                .dependsOn(gitCheckUncommittedChanges)
-//                .setOnlyIf(task ->
-//                        (boolean) gitCheckUncommittedChanges.getExtensions().getByName("result"));
-//        gitGetLastVersion.setGroup(TASK_GROUP_NAME);
-
-
-
+        GitCreateTagTask createTagTask = project.getTasks().register("gitCreateTag", GitCreateTagTask.class).get();
+        createTagTask.dependsOn(headTagTask)
+                     .dependsOn(gitCheckUncommittedChangesTask)
+                     .setOnlyIf(task -> !headTagTask.getState().getSkipped()
+                             && !(boolean) headTagTask.getExtensions().getByName("result"));
+        createTagTask.setGroup(TASK_GROUP_NAME);
     }
 }

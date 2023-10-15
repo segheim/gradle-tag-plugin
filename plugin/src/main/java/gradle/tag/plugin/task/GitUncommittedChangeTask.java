@@ -8,7 +8,7 @@ import org.apache.logging.log4j.core.config.Configurator;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
-import java.util.Optional;
+import java.util.List;
 
 public class GitUncommittedChangeTask extends DefaultTask {
 
@@ -27,32 +27,25 @@ public class GitUncommittedChangeTask extends DefaultTask {
     public void checkUncommittedChanges() {
         boolean isUncommittedChanges = false;
         boolean isUncommittedChangesCached = false;
-        Optional<String> uncommittedChanges = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES);
-        Optional<String> uncommittedChangesCached = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES_CACHED);
+        List<String> outputUncommittedChanges = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES);
+        List<String> outputUncommittedChangesCached = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_UNCOMMITTED_CHANGES_CACHED);
 
-        if(uncommittedChanges.isPresent()) {
-            log.info("Commit present: {}", uncommittedChanges.get());
+        if (!outputUncommittedChanges.isEmpty()) {
+            log.info("Commit present: {}", outputUncommittedChanges.get(0));
             isUncommittedChanges = true;
-            if (uncommittedChanges.get() == "") {
-                isUncommittedChanges = false;
-            }
         }
-        if(uncommittedChangesCached.isPresent()) {
-            log.info("CACHEDCommit present: {}", uncommittedChangesCached.get());
+
+        if (!outputUncommittedChangesCached.isEmpty()) {
+            log.info("CACHEDCommit present: {}", outputUncommittedChangesCached.get(0));
             isUncommittedChangesCached = true;
-            if (uncommittedChangesCached.get() == "") {
-                log.info("EMPTY cached commit");
-                isUncommittedChangesCached = false;
-            }
         }
+
         boolean result = isUncommittedChanges || isUncommittedChangesCached;
         log.info("result: " + result);
         if (result) {
-            Optional<String> lastTagVersionOptional = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG_VERSION);
-            if (lastTagVersionOptional.isPresent()) {
-                if (lastTagVersionOptional.get() != "") {
-                    log.info("Build: {}.uncommitted", lastTagVersionOptional.get());
-                }
+            List<String> outputLastTagVersion = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG_VERSION);
+            if (!outputLastTagVersion.isEmpty()) {
+                log.info("Build: {}.uncommitted", outputLastTagVersion.get(0));
             }
         }
         log.info("Uncommitted Result: " + result);

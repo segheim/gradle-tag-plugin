@@ -6,6 +6,6 @@ import java.util.Optional;
 
 interface Command {
 
-    Optional<String> execute(String command) throws IOException;
+    List<String> execute(String command) throws IOException;
 
 }
