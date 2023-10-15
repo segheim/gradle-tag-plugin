@@ -60,6 +60,7 @@ public class GitCreateTagTask extends DefaultTask {
 
     private String incrementVersion(String tagVersion, boolean flagMajorVersion) {
         Integer majorVersion = Integer.parseInt(tagVersion.substring(TAG_MAJOR_BEGIN_INDEX, TAG_MAJOR_END_INDEX));
+        System.out.println(tagVersion.substring(TAG_MAJOR_BEGIN_INDEX, TAG_MAJOR_END_INDEX));
         Integer minorVersion = Integer.parseInt(tagVersion.substring(TAG_MINOR_BEGIN_INDEX, TAG_MINOR_END_INDEX));
         String version;
         if (flagMajorVersion) {
