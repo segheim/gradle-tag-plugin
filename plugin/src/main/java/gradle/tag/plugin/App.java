@@ -7,7 +7,7 @@ public class App {
 //        String command = "git tag %s";
 //        System.out.println(ShellRunnerCommand.getInstance().execute(String.format(command, "v7.0")));
         String command = "git push origin %s";
-        System.out.println(ShellRunnerCommand.getInstance().execute(String.format(command, "v7.0")));
+//        System.out.println(ShellRunnerCommand.getInstance().execute(String.format(command, "v7.0")));
 
     }
 }
