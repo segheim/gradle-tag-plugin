@@ -38,9 +38,9 @@ public class GitCreateTagTask extends DefaultTask {
         if (!outputCurrentBranches.isEmpty()) {
             String currentBranch = outputCurrentBranches.get(0);
             List<String> outputLastTag = ShellRunnerCommand.getInstance().execute(GIT_COMMAND_LAST_TAG);
+            String tagVersion = "v1.0";
             if (!outputLastTag.isEmpty()) {
                 String lastTag = outputLastTag.get(0);
-                String tagVersion;
                 if (currentBranch.equals(QA_BRANCH_NAME) || currentBranch.equals(DEV_BRANCH_NAME)) {
                     tagVersion = incrementVersion(lastTag, false);
                 } else if (currentBranch.equals(STAGE_BRANCH_NAME)) {
@@ -50,12 +50,10 @@ public class GitCreateTagTask extends DefaultTask {
                 } else {
                     tagVersion = lastTag + SNAPSHOT_POSTFIX_FOR_OTHER_BRANCHES;
                 }
-
-                log.info("Tag: {}", tagVersion);
-
-                ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_CREATE_TAG, tagVersion));
-                ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_PUSH_REMOTE, tagVersion));
             }
+            log.info("Tag: {}", tagVersion);
+            ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_CREATE_TAG, tagVersion));
+            ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_PUSH_REMOTE, tagVersion));
         }
     }
 
