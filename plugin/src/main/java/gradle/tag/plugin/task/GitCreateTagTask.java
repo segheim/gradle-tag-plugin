@@ -53,6 +53,7 @@ public class GitCreateTagTask extends DefaultTask {
                 }
                 log.info("Tag: {}", tagVersion);
                 ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_CREATE_TAG, tagVersion));
+
                 ShellRunnerCommand.getInstance().execute(String.format(GIT_COMMAND_PUSH_REMOTE, tagVersion));
             }
         }
